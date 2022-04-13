@@ -9,6 +9,7 @@
 
 int display_map(char map[11][11])
 {
+    system("cls");
     for (int i = 0; i < 11; i++)
     {
         for (int j = 0; j < 11; j++)
@@ -129,34 +130,77 @@ int read_input(int* a, int* b)
         }
 
     } while (!i || strlen(inp) <= 1);
-    return   0;
+    return  0;
 }
 
-//---------------*
-//direction
-//0 - right
-//1 - down
-//2 - left
-//3 - right
-//---------------*
+void game(char map_hid[11][11], char map_vis[11][11], int hp[10], int* hp_a)
+{
+    int x_axis = 0;
+    int y_axis = 0;
+    read_input(&x_axis, &y_axis);
+    if (check_if_hit(x_axis, y_axis, map_hid))
+    {
+        
+        if (hit(map_hid, map_vis, x_axis, y_axis, hp, hp_a))
+        {
+            display_map(map_vis);
+            printf("Trafiony zatopiony!!!\n");
+        }
+        else
+        {
+            display_map(map_vis);
+            printf("Trafiony!\n");
+        }
+    }
+    else
+    {
+        map_hid[y_axis][x_axis] = '*';
+        map_vis[y_axis][x_axis] = '*';
+        display_map(map_vis);
+        printf("Pudlo\n");
+    }
+}
+
+bool check_if_hit(int x, int y, char map[11][11])
+{
+    if (map[y][x] >= 'K' && map[y][x] <= 'T') return true;
+    return false;
+}
+int hit(char map_hid[11][11], char map_vis[11][11], int x, int y, int hp[10], int* hp_a)
+{
+    int unit = map_hid[y][x];
+    hp[unit - 75] = hp[unit - 75] - 1;
+    map_hid[y][x] = 'X';
+    map_vis[y][x] = 'X';
+    unit -= 75;
+    if (hp[unit] == 0)
+    {
+        *hp_a = *hp_a - 1;
+        return 1;
+    }
+    return 0;
+}
+
 int generate_map(char map[11][11])
 {
-    //generuj mapê
     char symbol = 'K';
     bool check = false;
-    while (generate_unit(&symbol, 4, map)) {/**/}
+    for (int i = 0; i < UNITS_4; i++)
+    {
+        while (generate_unit(&symbol, 4, map)) {/**/ }
+    }
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < UNITS_3; i++)
     {
         while (generate_unit(&symbol, 3, map)) {/**/}
     }
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < UNITS_2; i++)
     {
         while (generate_unit(&symbol, 2, map)) {/**/}
     }
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < UNITS_1; i++)
     {
         while (generate_unit(&symbol, 1, map)) {/**/}
     }
@@ -167,9 +211,16 @@ int generate_map(char map[11][11])
 int generate_unit(char* symbol, int length, char map[11][11])
 {
     bool check = false;
-    int x = rand() % (10) + 1;
-    int y = rand() % (10) + 1;
-    int dir = rand() % (4);
+    int x = rand() % 10 + 1;
+    int y = rand() % 10 + 1;
+    //---------------*
+    //direction
+    //0 - right
+    //1 - down
+    //2 - left
+    //3 - right
+    //---------------*
+    int dir = rand() % 4;
     for (int i = dir; i < dir + 4; i++)
     {
         check = ship(x, y, -1 * abs(i - 3) + 3, length, *symbol, map);
@@ -182,18 +233,11 @@ int generate_unit(char* symbol, int length, char map[11][11])
     return check;
 }
 
-int num_in_range(int num, int min, int max)
-{
-    if (num < min) return min;
-    if (num > max) return max;
-    return num;
-}
-
 bool check_if_field_empty(char map[11][11], int x_start, int y_start, int x_end, int y_end)
 {
-    for (int i = x_start; i <= x_end; i++)
+    for (int i = y_start; i <= y_end; i++)
     {
-        for (int j = y_start; j <= y_end; j++)
+        for (int j = x_start; j <= x_end; j++)
         {
             if (map[i][j] != ' ') return true;
         }
@@ -201,16 +245,6 @@ bool check_if_field_empty(char map[11][11], int x_start, int y_start, int x_end,
     return false;
 }
 
-int ship_1(int x, int y, char map[11][11])
-{
-    int x_s = num_in_range(x - 1, 1, 10);
-    int y_s = num_in_range(y - 1, 1, 10);
-    int x_e = num_in_range(x + 1, 1, 10);
-    int y_e = num_in_range(y + 1, 1, 10);
-    if (check_if_field_empty(map, x_s, y_s, x_e, y_e)) return 1; //failed
-    
-    return 0; //success
-}
 int ship(int x, int y, int dir, int length, char symbol, char map[11][11])
 {
     int x_s;
@@ -257,6 +291,7 @@ int ship(int x, int y, int dir, int length, char symbol, char map[11][11])
     write_fields(map, symbol, x_s, y_s, x_e, y_e);
     return 0;
 }
+
 void write_fields(char map[11][11], char symbol, int x_start, int y_start, int x_end, int y_end)
 {
     for (int i = y_start; i <= y_end; i++)
@@ -270,11 +305,12 @@ void write_fields(char map[11][11], char symbol, int x_start, int y_start, int x
     }
 }
 
-//TODO stworzyæ system detekcji zatopieia. Tablica o rozmiarze iloœci jednostek, ka¿da maj¹ca dan¹ iloœæ ¿yæ. gdy dojdzie do 0, daæ komunikat trafiony zatopiony
 int main()
 {
-    //srand(time(NULL));
-    srand(2);
+    srand(time(NULL));
+    //srand(2);
+    int hp[10] = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
+    int hp_all = All_UNITS;
     char map_ai[11][11] =
     {
     {' ', 'A', 'B', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J'},
@@ -304,12 +340,12 @@ int main()
     {'0', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
     };
     generate_map(map_ai);
-    display_map(map_ai);
-    /*int x_axis = 0;
-    int y_axis = 0;
-    read_input(&x_axis, &y_axis);
-    printf("%i\n", x_axis);
-    printf("%i", y_axis);*/
-
+    display_map(map_user);
+    while (hp_all != 0)
+    {
+        game(map_ai, map_user, hp, &hp_all);
+    }
+    system("cls");
+    printf("KONIEC GRY!!!");
 }
 
