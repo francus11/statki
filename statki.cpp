@@ -50,84 +50,45 @@ int display_map(char map[11][11])
 //sprawdza i zamienia kordy na pozycje X i Y
 int read_input(int* a, int* b)
 { 
-    char inp[4];
-    int i;
+    char inp[4] {'a', 'a', 'a', 'a'};
+    int i = 0;
     do
     {
         printf("Podaj pole: ");
         i = scanf_s("%s", inp, 4);
         if (strlen(inp) == 2)
         {
-            if (inp[0] >= '1' && inp[0] <= '9')
+            if (inp[0] >= '1' && inp[0] <= '9' && ((inp[1] >= 'A' && inp[1] <= 'J') || (inp[1] >= 'a' && inp[1] <= 'j')))
             {
-                if (inp[1] >= 'A' && inp[1] <= 'J')
-                {
-                    *a = inp[1] - 'A' + 1;
-                    *b = inp[0] - '1' + 1;
-                }
-                else if (inp[1] >= 'a' && inp[1] <= 'j')
-                {
-                    *a = inp[1] - 'a' + 1;
-                    *b = inp[0] - '1' + 1;
-                }
-                else i = 0;
+                if (inp[1] >= 'a' && inp[1] <= 'j') inp[1] = inp[1] - 32;
+                *a = inp[1] - 'A' + 1;
+                *b = inp[0] - '1' + 1;
             }
-            else if (inp[0] >= 'A' && inp[0] <= 'J')
+            else if (((inp[0] >= 'A' && inp[0] <= 'J') || (inp[0] >= 'a' && inp[0] <= 'j')) && (inp[1] >= '1' && inp[1] <= '9'))
             {
-                if (inp[1] >= '1' && inp[1] <= '9')
-                {
-                    *a = inp[0] - 'A' + 1;
-                    *b = inp[1] - '1' + 1;
-                }
-                else i = 0;
-            }
-            else if (inp[0] >= 'a' && inp[0] <= 'j')
-            {
-                if (inp[1] >= '1' && inp[1] <= '9')
-                {
-                    *a = inp[0] - 'a' + 1;
-                    *b = inp[1] - '1' + 1;
-                }
-                else i = 0;
+                if (inp[0] >= 'a' && inp[0] <= 'j') inp[0] = inp[0] - 32;
+                *a = inp[0] - 'A' + 1;
+                *b = inp[1] - '1' + 1;
             }
             else i = 0;
         }
         else if (strlen(inp) == 3)
         {
-            if (inp[0] >= 'A' && inp[0] <= 'J')
+            if ((inp[0] >= 'A' && inp[0] <= 'J' || (inp[0] >= 'a' && inp[0] <= 'j')) && (inp[1] >= '1' && inp[2] <= '0'))
             {
-                if (inp[1] >= '1' && inp[2] <= '0')
-                {
-                    *a = inp[0] - 'A' + 1;
-                    *b = 10;
-                }
-                else i = 0;
+                if (inp[0] >= 'a' && inp[0] <= 'j') inp[0] = inp[0] - 32;
+                *a = inp[0] - 'A' + 1;
+                *b = 10;
             }
-            else if (inp[0] >= 'a' && inp[0] <= 'j')
+            else if (inp[0] == '1' && inp[1] == '0' && ((inp[2] >= 'A' && inp[2] <= 'J') || (inp[2] >= 'a' && inp[2] <= 'j')))
             {
-                if (inp[1] == '1' && inp[2] == '0')
-                {
-                    *a = inp[0] - 'a' + 1;
-                    *b = 10;
-                }
-                else i = 0;
-            }
-            else if (inp[0] == '1' && inp[1] == '0')
-            {
-                if (inp[2] >= 'A' && inp[2] <= 'J')
-                {
-                    *a = inp[2] - 'A' + 1;
-                    *b = 10;
-                }
-                else if (inp[2] >= 'a' && inp[2] <= 'j')
-                {
-                    *a = inp[2] - 'a' + 1;
-                    *b = 10;
-                }
-                else i = 0;
+                if (inp[2] >= 'a' && inp[2] <= 'j') inp[2] = inp[2] - 32;
+                *a = inp[2] - 'A' + 1;
+                *b = 10;
             }
             else i = 0;
         }
+        else i = 0;
 
     } while (!i || strlen(inp) <= 1);
     return  0;
@@ -184,7 +145,6 @@ int hit(char map_hid[11][11], char map_vis[11][11], int x, int y, int hp[10], in
 int generate_map(char map[11][11])
 {
     char symbol = 'K';
-    bool check = false;
     for (int i = 0; i < UNITS_4; i++)
     {
         while (generate_unit(&symbol, 4, map)) {/**/ }
