@@ -50,7 +50,7 @@ int display_map(char map[11][11])
 //sprawdza i zamienia kordy na pozycje X i Y
 int read_input(int* a, int* b)
 { 
-    char inp[4] {'a', 'a', 'a', 'a'};
+    char inp[4] {'a', 'a', 'a', '\0'};
     int i = 0;
     do
     {
@@ -268,7 +268,6 @@ void write_fields(char map[11][11], char symbol, int x_start, int y_start, int x
 int main()
 {
     srand(time(NULL));
-    //srand(2);
     int hp[10] = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
     int hp_all = All_UNITS;
     char map_ai[11][11] =
